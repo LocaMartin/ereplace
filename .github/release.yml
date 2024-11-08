@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+    - name: Build
+      run: |
+        go build -o bin/ereplace ./cmd/ereplace
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v$GITHUB_REF_NAME
+        release_name: v$GITHUB_REF_NAME
+        draft: false
+        prerelease: false
+    - name: Upload Asset
+      uses: actions/upload-artifact@v2
+      with:
+        name: ereplace
+        path: bin/ereplace
