@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 )
 
 func modifyPayload(payload string) string {
-	payload = strings.Trim(payload)
+	payload = strings.TrimSpace(payload)
 	equalIndex := strings.Index(payload, "=")
 	if equalIndex != -1 {
 		url := payload[:equalIndex+1]
@@ -47,7 +48,7 @@ func main() {
 	}
 
 	// Start worker goroutines
-	numWorkers := min(os.cpuCount(), len(*multiplePayloadFilesFlag)*4) // Adjust this number based on your system's capabilities
+	numWorkers := min(runtime.NumCPU(), len(*multiplePayloadFilesFlag)*4)
 	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
 		go worker(inputChan, outputChan, &wg)
