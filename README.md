@@ -11,10 +11,10 @@ go install github.com/LocaMartin/ereplace@latest
 ##### Or you can download prebuild binary using `wget` & `curl` command and it move to `~/go/bin` directory
 
 ```
-wget -O ereplace https://github.com/LocaMartin/ereplace/cmd/ereplace/ereplace
+wget -O ereplace https://github.com/LocaMartin/ereplace/pkg/ereplace
 ```
 ```
-curl -o ereplace https://github.com/LocaMartin/ereplace/cmd/ereplace
+curl -o ereplace https://github.com/LocaMartin/ereplace/pkg/ereplace
 ```
 ```
 mv ereplace ~/go/bin
