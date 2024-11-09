@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"runtime"
 	"strings"
 	"sync"
+	"runtime"
 )
 
 func modifyPayload(payload string) string {
@@ -34,10 +34,11 @@ func main() {
 	var wg sync.WaitGroup
 
 	// Parse flags
-	urlFlag := flag.String("u", "", "Single payload to modify. Example: -u '/../../etc/passwd'")
-	payloadFileFlag := flag.String("pf", "", "File containing multiple payloads to modify. One payload per line.")
-	multiplePayloadFilesFlag := flag.String("mpf", "", "Files containing multiple payloads to modify. Can specify multiple files.")
-	saveFlag := flag.String("s", "", "Output file to save the modified payloads. Example: -s output.txt")
+	urlFlag := flag.String("u", "", "Single URL to modify. Example: -u 'httpx://example.com/file=help'")
+	payloadFlag := flag.String("p", "", "Single payload to modify. Example: -p '/../etc/passwd'")
+	payloadFileFlag := flag.String("pf", "", "File containing multiple payloads to modify. Can specify multiple files.")
+	urlFileFlag := flag.String("uf", "", "File containing multiple URLs to modify. Can specify multiple files.")
+	saveFlag := flag.String("s", "", "Output file to save the modified payloads. Example: -s results.txt")
 	versionFlag := flag.Bool("version", false, "Print version information")
 
 	flag.Parse()
@@ -48,16 +49,16 @@ func main() {
 	}
 
 	// Start worker goroutines
-	numWorkers := min(runtime.NumCPU(), len(*multiplePayloadFilesFlag)*4)
+	numWorkers := min(runtime.NumCPU(), len(*payloadFileFlag)*4)
 	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
 		go worker(inputChan, outputChan, &wg)
 	}
 
 	// Read inputs
-	if *urlFlag != "" {
-		inputChan <- *urlFlag
-	} else if *payloadFileFlag != "" {
+	if *urlFlag != "" && *payloadFlag != "" {
+		inputChan <- *urlFlag + "=" + *payloadFlag
+	} else if *urlFlag != "" && *payloadFileFlag != "" {
 		data, err := ioutil.ReadFile(*payloadFileFlag)
 		if err != nil {
 			fmt.Printf("Error reading file '%s': %v\n", *payloadFileFlag, err)
@@ -66,8 +67,24 @@ func main() {
 		for _, line := range strings.Split(string(data), "\n") {
 			inputChan <- line
 		}
-	} else if *multiplePayloadFilesFlag != "" {
-		for _, file := range strings.Split(*multiplePayloadFilesFlag, " ") {
+	} else if *urlFileFlag != "" && *payloadFileFlag != "" {
+		urlData, err := ioutil.ReadFile(*urlFileFlag)
+		if err != nil {
+			fmt.Printf("Error reading file '%s': %v\n", *urlFileFlag, err)
+			os.Exit(1)
+		}
+		for _, urlLine := range strings.Split(string(urlData), "\n") {
+			payloadData, err := ioutil.ReadFile(*payloadFileFlag)
+			if err != nil {
+				fmt.Printf("Error reading payload file '%s': %v\n", *payloadFileFlag, err)
+				continue
+			}
+			for _, payloadLine := range strings.Split(string(payloadData), "\n") {
+				inputChan <- urlLine + "=" + payloadLine
+			}
+		}
+	} else if *payloadFileFlag != "" {
+		for _, file := range strings.Split(*payloadFileFlag, " ") {
 			data, err := ioutil.ReadFile(file)
 			if err != nil {
 				fmt.Printf("Error reading file '%s': %v\n", file, err)
