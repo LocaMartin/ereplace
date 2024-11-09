@@ -1,13 +1,26 @@
 # ereplace
 ### This tool is tested on ```go 1.23.2```
 #### replace URL parameter value with ease with ereplace
-This project is inspired by <a src='https://github.com/tomnomnom/qsreplace'>qsreplece</a> project .
+This project is inspired by <a herf='https://github.com/tomnomnom/qsreplace'>qsreplece</a> project .
 
 #### Installation
 
 ```
 go install github.com/LocaMartin/ereplace@latest
 ```
+##### Or you can download prebuild binary using `wget` & `curl` command and it move to `~/go/bin` directory
+
+```
+wget -O ereplace https://github.com/LocaMartin/ereplace/cmd/ereplace/ereplace
+```
+```
+curl -o ereplace https://github.com/LocaMartin/ereplace/cmd/ereplace
+```
+```
+mv ereplace ~/go/bin
+```
+
+
 #### Flags
 
 - `-h`: Show help message
