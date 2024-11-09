@@ -16,7 +16,7 @@ jobs:
         go-version: 1.16
     - name: Build
       run: |
-        go build -o bin/ereplace ./cmd/ereplace
+        go build -o bin/ereplace ./cmd/ereplace/ereplace
     - name: Create Release
       uses: actions/create-release@v1
       env:
